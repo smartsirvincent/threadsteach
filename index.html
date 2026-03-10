@@ -8,112 +8,42 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Outfit:wght@300;500;800&display=swap" rel="stylesheet">
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['"Noto Sans TC"', 'sans-serif'],
-                        outfit: ['"Outfit"', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            dark: '#0a0a0a',
-                            light: '#f4f4f5',
-                            accent: '#10b981', // Niuniu Green
-                            neon: '#34d399'
-                        }
-                    }
+                    fontFamily: { sans: ['"Noto Sans TC"', 'sans-serif'], outfit: ['"Outfit"', 'sans-serif'] },
+                    colors: { brand: { dark: '#0a0a0a', light: '#f4f4f5', accent: '#10b981', neon: '#34d399' } }
                 }
             }
         }
     </script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
 
     <style>
-        body {
-            background-color: #0a0a0a;
-            color: #f4f4f5;
-            overflow-x: hidden;
-            cursor: none; 
-        }
-
-        /* Global Noise Texture */
+        body { background-color: #0a0a0a; color: #e5e7eb; overflow-x: hidden; cursor: none; line-height: 1.8; }
         .noise-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            z-index: 50;
-            opacity: 0.04;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 50; opacity: 0.05;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
-
-        /* Custom Cursor */
         .custom-cursor {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 20px;
-            height: 20px;
-            background-color: #f4f4f5;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            z-index: 100;
-            mix-blend-mode: difference;
-            transition: width 0.3s ease, height 0.3s ease, background-color 0.3s ease;
+            position: fixed; top: 0; left: 0; width: 20px; height: 20px; background-color: #f4f4f5; border-radius: 50%;
+            transform: translate(-50%, -50%); pointer-events: none; z-index: 100; mix-blend-mode: difference; transition: all 0.2s ease;
         }
-        .custom-cursor.hovered {
-            width: 60px;
-            height: 60px;
-            background-color: #34d399;
-        }
+        .custom-cursor.hovered { width: 60px; height: 60px; background-color: #34d399; }
+        .glass-panel { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+        ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: #0a0a0a; } ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; } ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+        
+        /* Table Styling */
+        .glass-table th, .glass-table td { border: 1px solid rgba(255,255,255,0.1); padding: 1.5rem; }
+        .glass-table th { background: rgba(16, 185, 129, 0.1); color: #34d399; font-weight: 700; }
+        .glass-table td { background: rgba(0,0,0,0.2); transition: background 0.3s; }
+        .glass-table td:hover { background: rgba(16, 185, 129, 0.05); }
 
-        /* Glassmorphism */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        /* Input Styling */
-        .magnetic-input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .magnetic-input:focus {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: #10b981;
-            outline: none;
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
-        }
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0a0a0a; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #10b981; }
-
-        .v-line {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 1px;
-            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.05), transparent);
-            z-index: -1;
-        }
+        .zuvio-box { background: linear-gradient(135deg, rgba(52, 211, 153, 0.1) 0%, rgba(0,0,0,0) 100%); border-left: 4px solid #10b981; }
     </style>
 </head>
 <body class="antialiased selection:bg-brand-accent selection:text-white">
@@ -121,218 +51,294 @@
     <div class="noise-overlay"></div>
     <div class="custom-cursor" id="cursor"></div>
 
-    <div class="fixed inset-0 pointer-events-none flex justify-between px-10 md:px-20 z-[-1]">
-        <div class="v-line left-[20%]"></div>
-        <div class="v-line left-[50%]"></div>
-        <div class="v-line left-[80%]"></div>
-    </div>
-
     <header class="relative min-h-screen flex flex-col justify-center items-center px-4 overflow-hidden">
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-accent/20 rounded-full blur-[120px] pointer-events-none"></div>
-        
-        <div class="z-10 text-center max-w-4xl mx-auto hero-content">
+        <div class="z-10 text-center max-w-5xl mx-auto hero-content">
             <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel mb-8 text-sm font-outfit tracking-widest uppercase text-brand-neon">
-                <iconify-icon icon="solar:clapperboard-play-bold-duotone"></iconify-icon>
-                AI 應用與 Vibe Coding 實戰專案
+                <iconify-icon icon="solar:clapperboard-play-bold-duotone"></iconify-icon> AI 應用與 Vibe Coding 實戰專案
             </div>
-            
             <h1 class="text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-tight tracking-tight">
-                THREADS <br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-gray-500">DIGITAL PERSONA</span>
+                THREADS <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-gray-500">DIGITAL PERSONA</span>
             </h1>
-            
-            <p class="text-lg md:text-xl text-gray-400 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
-                這是一場數位人格的淬鍊。跟著 <span class="text-white font-medium">義美鮮乳 Niuniu</span> 的腳步，解構品牌調性，鍛造出具備極致傳播力的 Threads 爆文邏輯。（本頁面為數位練習草稿紙，請於完成後點擊最下方按鈕複製內容）
+            <p class="text-lg md:text-xl text-gray-400 mb-12 max-w-3xl mx-auto font-light leading-relaxed">
+                在去中心化的演算法洪流中，品牌如何被看見？這是一場數位人格的淬鍊。本教材將以 <span class="text-white font-medium">義美鮮乳 Niuniu</span> 為核心範例，深度解構品牌調性，鍛造具備極致傳播力的社群邏輯。<br><br>
+                <span class="text-brand-neon text-sm font-bold tracking-widest uppercase">⚠️ 課堂提示：本網頁為純教學載體，所有實作任務請登入 Zuvio 系統完成填寫。</span>
             </p>
-
-            <button id="scrollBtn" class="magnetic-btn group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-black rounded-full font-bold overflow-hidden transition-transform hover:scale-105">
-                <span class="relative z-10 flex items-center gap-2">
-                    開始實作 
-                    <iconify-icon icon="solar:arrow-down-linear" class="text-xl group-hover:translate-y-1 transition-transform"></iconify-icon>
-                </span>
-                <div class="absolute inset-0 bg-brand-accent transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out z-0"></div>
+            <button id="scrollBtn" class="magnetic-element relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-black rounded-full font-bold overflow-hidden transition-transform hover:scale-105">
+                <span class="relative z-10 flex items-center gap-2">進入課程 <iconify-icon icon="solar:arrow-down-linear" class="text-xl"></iconify-icon></span>
             </button>
-        </div>
-
-        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50 scroll-indicator">
-            <span class="text-xs font-outfit tracking-widest uppercase">Scroll to explore</span>
-            <div class="w-[1px] h-12 bg-gradient-to-b from-white to-transparent"></div>
         </div>
     </header>
 
     <main class="relative z-10 pb-32 px-4" id="formSection">
-        <div class="max-w-4xl mx-auto space-y-12">
+        <div class="max-w-4xl mx-auto space-y-16">
             
-            <div class="glass-panel rounded-3xl p-8 md:p-10 gs-reveal relative overflow-hidden group">
+            <div class="glass-panel rounded-3xl p-8 md:p-12 gs-reveal relative overflow-hidden group">
                 <div class="absolute top-0 left-0 w-1 h-full bg-white/20 group-hover:bg-brand-neon transition-colors"></div>
-                <div class="flex flex-col md:flex-row md:items-center gap-4 mb-8">
-                    <span class="font-outfit text-4xl md:text-5xl font-black text-white/10">01</span>
+                <div class="flex items-center gap-4 mb-8">
+                    <span class="font-outfit text-5xl font-black text-white/10">01</span>
                     <div>
-                        <h2 class="text-2xl font-bold tracking-wide">品牌靈魂素描 <span class="text-gray-500 text-sm font-normal ml-2">Persona</span></h2>
-                        <p class="text-gray-400 mt-1 text-sm">Threads 追蹤的是「人」。請避開官腔，設定一個有喜好、有缺點的「人設」。</p>
+                        <h2 class="text-3xl font-bold tracking-wide text-white">品牌人格化與定位策略</h2>
+                        <p class="text-brand-neon mt-1 text-sm font-outfit uppercase tracking-widest">Brand Persona & Positioning</p>
                     </div>
                 </div>
-
-                <div class="bg-black/40 rounded-2xl p-6 mb-8 border border-white/5">
-                    <div class="flex items-center gap-3 mb-3 text-brand-neon">
-                        <iconify-icon icon="solar:lightbulb-bolt-bold-duotone" class="text-2xl"></iconify-icon>
-                        <span class="font-bold tracking-wide">Niuniu 創意解析</span>
+                <div class="text-gray-300 space-y-6 text-lg leading-relaxed font-light">
+                    <p>在傳統的 Facebook 或 Instagram 時代，品牌習慣穿上「西裝」，用「本公司、小編、誠摯邀請」這種由上而下的公關語言與消費者對話。然而，Threads 的演算法與使用者文化徹底顛覆了這套邏輯。在 Threads，使用者追蹤的是「活生生的人」，而非「冷冰冰的商標」。你的品牌必須進行「降維打擊」，脫掉西裝，換上私服，成為一個有血有肉的「數位分身 (Digital Avatar)」。</p>
+                    <p>要建立一個成功的品牌人格，你必須賦予它三個核心元素：<strong>具體的職業身份、討喜的性格缺陷，以及高辨識度的口頭禪。</strong></p>
+                    <p>為什麼需要「性格缺陷」？在心理學中，這被稱為「出醜效應 (Pratfall Effect)」。一個完美無瑕的官方帳號令人有距離感，但一個偶爾會犯錯、會抱怨、有著奇怪堅持的帳號，卻能瞬間引發情感共鳴。這就是「脆味（Threads 的獨特氛圍）」的來源。</p>
+                    
+                    <div class="bg-black/40 rounded-2xl p-6 border border-white/5 my-8">
+                        <div class="flex items-center gap-3 mb-4 text-brand-neon">
+                            <iconify-icon icon="solar:lightbulb-bolt-bold-duotone" class="text-3xl"></iconify-icon>
+                            <span class="text-xl font-bold">深度解析：義美鮮乳 Niuniu 的人格重塑</span>
+                        </div>
+                        <p class="mb-4">義美是一個擁有數十年歷史的龐大食品企業，如果用官方口吻發文，只會是一篇篇無聊的產品型錄。因此，我們為它萃取出「Niuniu」這個角色。</p>
+                        <ul class="list-disc pl-6 space-y-2">
+                            <li><strong>角色暱稱：</strong>Niuniu（一頭在義美牧場輪班的基層乳牛）。</li>
+                            <li><strong>核心性格：</strong>對「鮮度」有著極度偏執的職人精神，同時帶點勞工階級的厭世感。</li>
+                            <li><strong>討喜的弱點（缺陷）：</strong>看到消費者把鮮乳拿去微波加熱太久會暴怒；明明很怕冷，卻為了保鮮不得不一直待在冷藏室。</li>
+                            <li><strong>專屬口頭禪：</strong>「鮮度是我的底線，好喝是你的福氣。」、「我今天又產了 10 公升，你們這些人類最好給我喝乾淨。」</li>
+                        </ul>
                     </div>
-                    <p class="text-gray-300 leading-relaxed text-sm">
-                        一個對「鮮度」有強迫症、愛碎碎念的牧場乳牛。<br>
-                        <span class="text-white font-medium">弱點：</span>看到有人把鮮乳拿去微波太久會生氣。<br>
-                        <span class="text-white font-medium">口頭禪：</span>「鮮度是我的底線，好喝是你的福氣。」
-                    </p>
+                    <p>透過這樣的設定，Niuniu 不再是一個商標，而是一個你會想在午休時間跟他聊天的「同事」。當 Niuniu 抱怨冷藏車溫度太低時，他其實正在無形中傳遞「義美鮮乳全程低溫保鮮」的產品賣點。這就是最高級的社群行銷：<strong>不賣產品，賣人設。</strong></p>
                 </div>
-
-                <div class="space-y-3">
-                    <label class="block text-sm font-medium text-brand-neon">👉 請設定「你的品牌」角色暱稱、可愛的弱點與口頭禪：</label>
-                    <textarea id="ans1" rows="3" class="magnetic-input w-full rounded-xl p-4 resize-none" placeholder="例如：一位每天被數據追殺的運動行銷員，口頭禪是..."></textarea>
+                
+                <div class="zuvio-box rounded-xl p-6 mt-8">
+                    <h3 class="text-white font-bold text-xl mb-2 flex items-center gap-2">
+                        <iconify-icon icon="solar:target-bold-duotone" class="text-brand-accent"></iconify-icon> 🎯 Zuvio 實作任務 01
+                    </h3>
+                    <p class="text-gray-300">請開啟 Zuvio，進入「實作任務 1：品牌靈魂素描」。請為你的期末專案品牌設定一個具體的數位人格。必須包含：(1) 角色暱稱與職業 (2) 一個討喜的性格弱點 (3) 一句專屬口頭禪。</p>
                 </div>
             </div>
 
-            <div class="glass-panel rounded-3xl p-8 md:p-10 gs-reveal relative overflow-hidden group">
+            <div class="glass-panel rounded-3xl p-8 md:p-12 gs-reveal relative overflow-hidden group">
                 <div class="absolute top-0 left-0 w-1 h-full bg-white/20 group-hover:bg-brand-neon transition-colors"></div>
-                <div class="flex flex-col md:flex-row md:items-center gap-4 mb-8">
-                    <span class="font-outfit text-4xl md:text-5xl font-black text-white/10">02</span>
+                <div class="flex items-center gap-4 mb-8">
+                    <span class="font-outfit text-5xl font-black text-white/10">02</span>
                     <div>
-                        <h2 class="text-2xl font-bold tracking-wide">主題靈感九宮格 <span class="text-gray-500 text-sm font-normal ml-2">Ideation Matrix</span></h2>
-                        <p class="text-gray-400 mt-1 text-sm">運用「品牌調性」與「受眾群體」兩個維度，交叉產出內容靈感。</p>
+                        <h2 class="text-3xl font-bold tracking-wide text-white">主題發想：受眾與調性九宮格</h2>
+                        <p class="text-brand-neon mt-1 text-sm font-outfit uppercase tracking-widest">Ideation Matrix</p>
                     </div>
                 </div>
+                <div class="text-gray-300 space-y-6 text-lg leading-relaxed font-light">
+                    <p>經營 Threads 最常見的痛點就是「不知道今天要發什麼」。品牌小編往往被困在「產品規格」與「促銷活動」的死胡同裡。為了解決靈感枯竭的問題，我們引入「主題發想九宮格」系統。這是一個利用**「受眾群體 (Audience)」**與**「內容調性 (Tone of Voice)」**兩條軸線交叉碰撞，強制大腦產出多元內容的工具。</p>
+                    <p><strong>橫軸（受眾群體）：</strong> 你的產品通常不會只賣給同一種人。以鮮乳為例，它的受眾可以細分為：需要幫小孩準備早餐的「忙碌家長」、對蛋白質克數斤斤計較的「健身減脂族」，以及每天靠拿鐵續命的「厭世上班族」。</p>
+                    <p><strong>縱軸（內容調性）：</strong> 即使面對同一種人，你說話的方式也應該要有層次。我們將調性分為三種：「幽默自嘲」（拉近距離、引發轉發）、「專業硬核」（建立信任、展現權威）、「溫暖感性」（觸動內心、建立品牌忠誠）。</p>
+                    <p>將這兩個維度交疊，我們就能得到 9 個截然不同的內容切入點。以下是義美 Niuniu 的實戰九宮格圖表：</p>
 
-                <div class="bg-black/40 rounded-2xl p-6 mb-8 border border-white/5">
-                    <div class="flex items-center gap-3 mb-3 text-brand-neon">
-                        <iconify-icon icon="solar:map-arrow-square-bold-duotone" class="text-2xl"></iconify-icon>
-                        <span class="font-bold tracking-wide">Niuniu 維度拆解</span>
+                    <div class="overflow-x-auto my-8">
+                        <table class="glass-table w-full text-sm text-left">
+                            <thead>
+                                <tr>
+                                    <th class="w-1/4">調性 \ 受眾</th>
+                                    <th class="w-1/4 text-white">A. 忙碌家長族</th>
+                                    <th class="w-1/4 text-white">B. 健身減脂族</th>
+                                    <th class="w-1/4 text-white">C. 厭世上班族</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="font-bold text-white">1. 幽默 / 自嘲<br><span class="text-xs text-gray-400 font-normal">引發共鳴與轉發</span></td>
+                                    <td>小孩挑食不喝鮮奶？Niuniu 教你一秒把它變成「魔法白水」，其實就是倒進他最愛的杯子裡。</td>
+                                    <td>還在狂吞難喝的高蛋白？看看 Niuniu 產的奶，好喝到讓你忘記你正在減脂（雖然熱量還是要算）。</td>
+                                    <td>早上那杯咖啡加的不是奶，是「續命藥水」。Niuniu 宣布對全台上班族的精神狀態負責。</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-white">2. 專業 / 硬核<br><span class="text-xs text-gray-400 font-normal">展現知識與權威</span></td>
+                                    <td>解密：為什麼 100% 無添加的鮮乳對孩童的大腦發育最關鍵？營養師沒告訴你的鈣質吸收率。</td>
+                                    <td>運動後 30 分鐘的黃金補充期。乳清蛋白 vs. 純鮮乳，哪一個吸收率更高？Niuniu 用數據說話。</td>
+                                    <td>拿鐵好喝的科學秘密：當鮮乳加熱到 65 度時，乳脂肪甜度會達到巔峰。超過就毀了。</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-bold text-white">3. 溫暖 / 感性<br><span class="text-xs text-gray-400 font-normal">觸發深層情感綁定</span></td>
+                                    <td>「媽媽」這份工作沒有打卡下班。深夜溫熱的一杯鮮奶，是 Niuniu 給媽媽的溫柔擁抱。</td>
+                                    <td>深蹲破 PR 的那一刻很孤獨，但你流的每一滴汗，都值得用最純淨的鮮乳來犒賞自己。</td>
+                                    <td>凌晨四點的城市很安靜，當你加班到懷疑人生時，記得 Niuniu 也在牧場陪你一起醒著。</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <ul class="text-gray-300 text-sm space-y-2">
-                        <li><span class="text-white">受眾設定：</span>忙碌家長 / 健身族 / 厭世上班族</li>
-                        <li><span class="text-white">調性設定：</span>幽默 / 專業 / 感性</li>
-                        <li><span class="text-white">靈感產出：</span>(對厭世上班族+幽默) 咖啡加奶，是續命水而非拿鐵。</li>
+                    <p>透過這個九宮格，原本單一的「鮮乳產品」，瞬間裂變出 9 篇甚至 90 篇可以寫的 Threads 貼文。它幫助品牌跳脫「我好棒，快來買」的推銷邏輯，轉而思考「在特定的情緒下，我能為受眾提供什麼價值的內容」。</p>
+                </div>
+                
+                <div class="zuvio-box rounded-xl p-6 mt-8">
+                    <h3 class="text-white font-bold text-xl mb-2 flex items-center gap-2">
+                        <iconify-icon icon="solar:target-bold-duotone" class="text-brand-accent"></iconify-icon> 🎯 Zuvio 實作任務 02
+                    </h3>
+                    <p class="text-gray-300">請開啟 Zuvio，進入「實作任務 2：主題九宮格發想」。請為你的品牌定義 2 個受眾與 2 個調性（組成 4 宮格即可），並針對每個格子寫下一句具體的發文主題概念。</p>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-3xl p-8 md:p-12 gs-reveal relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-1 h-full bg-white/20 group-hover:bg-brand-neon transition-colors"></div>
+                <div class="flex items-center gap-4 mb-8">
+                    <span class="font-outfit text-5xl font-black text-white/10">03</span>
+                    <div>
+                        <h2 class="text-3xl font-bold tracking-wide text-white">廢文變金文：勾引眼球的標題改寫術</h2>
+                        <p class="text-brand-neon mt-1 text-sm font-outfit uppercase tracking-widest">Copywriting & The Hook</p>
+                    </div>
+                </div>
+                <div class="text-gray-300 space-y-6 text-lg leading-relaxed font-light">
+                    <p>Threads 的介面設計極度扁平，使用者的滑動速度極快。決定一篇貼文生死存亡的關鍵，就在於「黃金三秒」。如果第一句話無法創造懸念、引發共鳴或激起憤怒，這篇文就會被無情刷過。企業最常犯的錯誤，就是把 PR 新聞稿或 Facebook 的文案原封不動地搬到 Threads 上。</p>
+                    <p>如何寫出具有「脆味」的標題？核心秘訣有三個：<br>
+                    <strong>1. 刪除所有空洞的形容詞：</strong> 丟掉「尊榮、極致、卓越、領先」這類廢話，改用「動詞」或「具體數字」來推進畫面。<br>
+                    <strong>2. 加入體感與情緒描述：</strong> 不要客觀陳述事實，要描述你經歷這個事實時的「生理反應」（例如：氣到發抖、笑到流淚、加班到靈魂出竅）。<br>
+                    <strong>3. 善用「反問」或「示弱」結尾：</strong> 降低姿態，把話語權交給讀者，誘發他們留言的衝動。</p>
+
+                    <div class="grid md:grid-cols-2 gap-6 my-8">
+                        <div class="bg-black/30 p-6 rounded-xl border border-white/5">
+                            <span class="text-red-400 font-bold block mb-2">❌ 失敗的官方原稿：</span>
+                            <p class="text-gray-400">「義美鮮乳採用 100% 國家標準生乳製造，無添加任何人工香料，提供您最純淨的營養選擇，歡迎至各大通路選購。」</p>
+                            <p class="text-sm mt-4 text-gray-500">（點評：像在唸教科書，使用者看到「歡迎選購」就啟動廣告防禦機制直接滑走。）</p>
+                        </div>
+                        <div class="bg-brand-accent/10 p-6 rounded-xl border border-brand-accent/20">
+                            <span class="text-brand-neon font-bold block mb-2">✅ Niuniu 的 Threads 金句：</span>
+                            <p class="text-white">「別再私訊問我有沒有加有的沒的了。除了純鮮乳，我真的什麼都沒有。這樣純情（？）的我，你確定不帶回家嗎？」</p>
+                            <p class="text-sm mt-4 text-brand-neon/80">（點評：用傲嬌的口吻回應質疑，將「無添加」轉化為「純情」的擬人化特質，最後用反問句促購。）</p>
+                        </div>
+                    </div>
+                    <p>再舉一個體育行銷的例子。如果你要推廣一場棒球賽：<br>
+                    原稿：「本週六將迎來中華職棒總冠軍賽，戰況激烈，敬請期待。」<br>
+                    改寫：<strong>「如果這禮拜六沒有搶到總冠軍賽的票，我大概會在家裡著急到把遙控器捏碎...有人跟我一樣現在就在緊張了嗎？」</strong><br>
+                    透過情感的投射與具體的行為描述（捏碎遙控器），標題的張力瞬間提升了數個檔次。</p>
+                </div>
+                
+                <div class="zuvio-box rounded-xl p-6 mt-8">
+                    <h3 class="text-white font-bold text-xl mb-2 flex items-center gap-2">
+                        <iconify-icon icon="solar:target-bold-duotone" class="text-brand-accent"></iconify-icon> 🎯 Zuvio 實作任務 03
+                    </h3>
+                    <p class="text-gray-300">請開啟 Zuvio，進入「實作任務 3：廢文變金文」。請挑選一句你品牌官網或企劃書上的「官方宣傳語」，運用上述的三個秘訣，將其改寫成具有強烈情緒張力的 Threads 標題。</p>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-3xl p-8 md:p-12 gs-reveal relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-1 h-full bg-white/20 group-hover:bg-brand-neon transition-colors"></div>
+                <div class="flex items-center gap-4 mb-8">
+                    <span class="font-outfit text-5xl font-black text-white/10">04</span>
+                    <div>
+                        <h2 class="text-3xl font-bold tracking-wide text-white">高互動心理學：投票與兩難設計</h2>
+                        <p class="text-brand-neon mt-1 text-sm font-outfit uppercase tracking-widest">Interactive Engagement</p>
+                    </div>
+                </div>
+                <div class="text-gray-300 space-y-6 text-lg leading-relaxed font-light">
+                    <p>在社群演算法中，「互動率（Engagement Rate）」是決定流量池大小的唯一指標。而促使人類進行互動的最有效手段，就是創造**「群體歸屬感（Tribalism）」**與**「認知兩難（Dilemma）」**。利用 Threads 內建的投票功能，我們可以用極低的參與門檻，換取極高的留言與曝光。</p>
+                    <p>設計互動投票的最高指導原則是：<strong>「不要問太正經的問題，要問會讓人想吵架的日常小事。」</strong></p>
+                    <p>如果你問：「請問您認為義美鮮乳好喝嗎？ A. 好喝 B. 不好喝」，這是一個毫無價值的調查，因為它無法激發情緒。但如果你改變切入點，將選擇題變成「信仰之戰」，效果就會完全不同。例如：在食物的吃法上，人類有著莫名其妙的堅持與黨派之爭。你可以挑起「火鍋芋頭教 vs. 反芋頭教」、「咖哩飯拌開 vs. 不拌開」這類永無休止的爭論。</p>
+
+                    <div class="bg-black/40 rounded-2xl p-6 border border-white/5 my-8">
+                        <div class="flex items-center gap-3 mb-4 text-brand-neon">
+                            <iconify-icon icon="solar:users-group-two-rounded-bold-duotone" class="text-3xl"></iconify-icon>
+                            <span class="text-xl font-bold">Niuniu 的信仰之戰範例</span>
+                        </div>
+                        <p class="mb-2 text-white font-medium">前言引導：</p>
+                        <p class="text-gray-400 italic mb-4">「這問題困擾 Niuniu 很久了。昨天看到一個人類把我的鮮乳倒進黑咖啡裡，我差點衝出冷藏櫃阻止他。鮮乳就是要喝純的啊！這攸關牧場的尊嚴，請大家站出來投票：」</p>
+                        <p class="mb-2 text-white font-medium">選項設計：</p>
+                        <ul class="list-none space-y-2 text-brand-neon">
+                            <li>🔥 <strong class="text-white">A. 原味鮮乳派：</strong> 不加一滴水，單喝最香。</li>
+                            <li>☕ <strong class="text-white">B. 拿鐵邪教派：</strong> 沒有咖啡因，鮮奶就沒有靈魂。</li>
+                        </ul>
+                    </div>
+                    <p>這個投票的巧妙之處在於，無論讀者投哪一個選項，Niuniu 都能在留言區與他們展開充滿火花的對話。對於 A 選項，Niuniu 可以回覆「果然懂喝，賜你一日牧場 VIP」；對於 B 選項，Niuniu 則可以傲嬌地說「算你狠，但至少你選了最好的奶來配咖啡」。這種透過二選一強迫受眾「選邊站」的技巧，能快速堆疊留言數，騙過演算法，讓貼文突破同溫層擴散到陌生人的首頁。</p>
+                </div>
+                
+                <div class="zuvio-box rounded-xl p-6 mt-8">
+                    <h3 class="text-white font-bold text-xl mb-2 flex items-center gap-2">
+                        <iconify-icon icon="solar:target-bold-duotone" class="text-brand-accent"></iconify-icon> 🎯 Zuvio 實作任務 04
+                    </h3>
+                    <p class="text-gray-300">請開啟 Zuvio，進入「實作任務 4：互動投票設計」。請針對你的品牌，設計一個能引發「兩派人馬論戰」的二選一投票。請提供引人入勝的前言描述，以及 A/B 兩個對立的選項。</p>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-3xl p-8 md:p-12 gs-reveal relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-1 h-full bg-white/20 group-hover:bg-brand-neon transition-colors"></div>
+                <div class="flex items-center gap-4 mb-8">
+                    <span class="font-outfit text-5xl font-black text-white/10">05</span>
+                    <div>
+                        <h2 class="text-3xl font-bold tracking-wide text-white">串連文敘事架構：打造深度沉浸感</h2>
+                        <p class="text-brand-neon mt-1 text-sm font-outfit uppercase tracking-widest">Long-form Thread Storytelling</p>
+                    </div>
+                </div>
+                <div class="text-gray-300 space-y-6 text-lg leading-relaxed font-light">
+                    <p>雖然 Threads 是以短文字為主的平台，但這不代表你無法傳遞深度的知識或故事。透過「串連文（Thread）」功能，你可以將一篇 500 字到 1000 字的長文，拆解成數個連續的對話框。這種「麵包屑式」的閱讀體驗，能大幅降低使用者的視覺壓力，讓他們不知不覺地跟著你的節奏滑到最後。</p>
+                    <p>一個引人入勝的串連文，必須具備嚴謹的起承轉合架構：</p>
+                    <ul class="list-decimal pl-6 space-y-3">
+                        <li><strong>第一則（誘餌與痛點）：</strong> 絕對不要在第一段把話說完。你必須拋出一個反常識的觀點、一個驚人的數據，或是分享一個慘痛的失敗經驗。目的是製造懸念，讓讀者點擊「顯示包含的串文」。</li>
+                        <li><strong>中間段落（節奏與乾貨）：</strong> 每一則串文只講「一個核心觀念」。排版上，每則盡量控制在 3-4 行以內，善用條列式或 Emoji 來增加閱讀的呼吸空間。這部分是展現你專業底蘊的地方，將複雜的產業知識轉化為人話。</li>
+                        <li><strong>最後一則（轉折與行動呼籲 CTA）：</strong> 在故事的結尾給出一個昇華的結論，並明確告訴讀者接下來該做什麼（例如：追蹤帳號、留言索取資源、點擊個人主頁連結）。</li>
                     </ul>
-                </div>
 
-                <div class="space-y-3">
-                    <label class="block text-sm font-medium text-brand-neon">👉 設定你的兩個維度（調性與受眾），並寫出至少 3 個交叉主題：</label>
-                    <textarea id="ans2" rows="4" class="magnetic-input w-full rounded-xl p-4 resize-none" placeholder="受眾維度：... | 調性維度：... | 主題 1：... | 主題 2：..."></textarea>
+                    <div class="bg-black/40 rounded-2xl p-6 border border-white/5 my-8">
+                        <div class="flex items-center gap-3 mb-4 text-brand-neon">
+                            <iconify-icon icon="solar:layers-minimalistic-bold-duotone" class="text-3xl"></iconify-icon>
+                            <span class="text-xl font-bold">Niuniu 的深夜深度長文示範</span>
+                        </div>
+                        <div class="space-y-4 text-sm text-gray-300">
+                            <div class="pl-4 border-l-2 border-gray-700 pb-2">
+                                <span class="text-white font-bold">Thread 1/4 (誘餌)：</span>「大家只知道義美鮮乳好喝，但沒人知道為了這口奶，我們這群乳牛每天凌晨四點經歷了什麼。這是一場沒有硝煙的『鮮度戰爭』。」
+                            </div>
+                            <div class="pl-4 border-l-2 border-gray-700 pb-2">
+                                <span class="text-white font-bold">Thread 2/4 (過程)：</span>「凌晨 4:00，牧場氣溫只有 12 度。當金屬擠乳器貼上皮膚的那一刻，真的是透心涼。但我們必須忍耐，因為剛擠下的生乳，如果不立刻送進超低溫冷藏槽，細菌的繁殖速度是幾何級數飆升的。」
+                            </div>
+                            <div class="pl-4 border-l-2 border-gray-700 pb-2">
+                                <span class="text-white font-bold">Thread 3/4 (專業核心)：</span>「這也是為什麼義美的物流車冷氣總是開到最強。從殺菌、裝瓶到配送，這是一條極度嚴苛的冷鏈。只要溫度差個兩度，那些珍貴的乳清蛋白就會開始質變。我們不求放得久，只求最新鮮。」
+                            </div>
+                            <div class="pl-4 border-l-2 border-transparent pb-2">
+                                <span class="text-brand-neon font-bold">Thread 4/4 (CTA)：</span>「下次在超市拿起這瓶鮮乳時，記得摸摸瓶身的冷度，那是我們凌晨四點的努力。喝完記得洗乾淨回收喔！有誰也是堅持只喝冷藏不喝保久乳的？留言區讓 Niuniu 看看你們的堅持。」
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="zuvio-box rounded-xl p-6 mt-8">
+                    <h3 class="text-white font-bold text-xl mb-2 flex items-center gap-2">
+                        <iconify-icon icon="solar:target-bold-duotone" class="text-brand-accent"></iconify-icon> 🎯 Zuvio 實作任務 05
+                    </h3>
+                    <p class="text-gray-300">請開啟 Zuvio，進入「實作任務 5：深度串連大綱設計」。為你的品牌規劃一篇具有深度的知識型或故事型串連文（至少 3-4 則）。請寫出每一則的核心內容與敘事節奏，並在最後一則加上有效的 CTA。</p>
                 </div>
             </div>
 
-            <div class="glass-panel rounded-3xl p-8 md:p-10 gs-reveal relative overflow-hidden group">
+            <div class="glass-panel rounded-3xl p-8 md:p-12 gs-reveal relative overflow-hidden group">
                 <div class="absolute top-0 left-0 w-1 h-full bg-white/20 group-hover:bg-brand-neon transition-colors"></div>
-                <div class="flex flex-col md:flex-row md:items-center gap-4 mb-8">
-                    <span class="font-outfit text-4xl md:text-5xl font-black text-white/10">03</span>
+                <div class="flex items-center gap-4 mb-8">
+                    <span class="font-outfit text-5xl font-black text-white/10">06</span>
                     <div>
-                        <h2 class="text-2xl font-bold tracking-wide">廢文變金文 <span class="text-gray-500 text-sm font-normal ml-2">Copywriting</span></h2>
-                        <p class="text-gray-400 mt-1 text-sm">刪掉形容詞，加入「體感」與「情緒」，掌握黃金三秒。</p>
+                        <h2 class="text-3xl font-bold tracking-wide text-white">社群公關秀：神回覆的防禦與反擊</h2>
+                        <p class="text-brand-neon mt-1 text-sm font-outfit uppercase tracking-widest">Community Management & Crisis</p>
                     </div>
                 </div>
+                <div class="text-gray-300 space-y-6 text-lg leading-relaxed font-light">
+                    <p>在 Threads 這樣高度公開且演算法頻繁推送陌生貼文的環境下，留言區往往比主貼文更精彩。品牌小編必須體認到一件事：<strong>「你回覆的對象，從來就不只是留言的那個人，而是成千上萬正在圍觀的其他吃瓜群眾。」</strong>這是一場公開的公關秀（Public Show）。</p>
+                    <p>當你遇到粉絲讚美時，不要只回「謝謝支持」，要懂得順水推舟，延伸話題；但更挑戰的，是遇到酸民（Trolls）或質疑時該如何應對。傳統企業遇到負評，第一反應往往是刪除留言或是貼上官腔的罐頭回覆：「感謝您的指教，我們會持續改進」。在 Threads 上，這種做法形同社群自殺，會立刻引來更多的嘲諷。</p>
+                    <p>高階的「神回覆」技巧，是採用柔道中的「借力打力」。面對惡意的攻擊，保持情緒的穩定，用自嘲、冷幽默，或是不卑不亢的態度將球殺回去。這不僅能化解危機，往往還能讓品牌在一夜之間吸粉無數（也就是著名的 Wendy's Twitter 效應）。</p>
 
-                <div class="bg-black/40 rounded-2xl p-6 mb-8 border border-white/5">
-                    <div class="flex items-center gap-3 mb-3 text-brand-neon">
-                        <iconify-icon icon="solar:pen-new-square-bold-duotone" class="text-2xl"></iconify-icon>
-                        <span class="font-bold tracking-wide">Niuniu 改寫示範</span>
+                    <div class="bg-black/40 rounded-2xl p-6 border border-white/5 my-8">
+                        <div class="flex items-center gap-3 mb-4 text-brand-neon">
+                            <iconify-icon icon="solar:chat-round-like-bold-duotone" class="text-3xl"></iconify-icon>
+                            <span class="text-xl font-bold">Niuniu 危機處理實錄</span>
+                        </div>
+                        <p class="mb-4"><strong>情境：</strong>一位酸民在 Niuniu 的貼文下留言：「義美這包裝幾十年都長一樣，字體也醜爆了，到底誰設計的啊？」</p>
+                        
+                        <div class="space-y-4">
+                            <div class="bg-red-900/20 p-4 rounded-lg border border-red-500/20">
+                                <span class="text-red-400 font-bold block mb-1">❌ 災難性的官方回覆：</span>
+                                <span class="text-sm">「親愛的顧客您好，感謝您對包裝的建議，您的反饋我們已記錄並將轉交設計部門評估，謝謝。」（無聊且官僚）</span>
+                            </div>
+                            <div class="bg-brand-accent/20 p-4 rounded-lg border border-brand-accent/30">
+                                <span class="text-brand-neon font-bold block mb-1">✅ Niuniu 的高維度反擊：</span>
+                                <span class="text-sm text-white">「Niuniu 這是復古經典美學，你懂什麼啦（傲嬌）。包裝再漂亮，難道裡面的奶會變甜嗎？我們是把設計費省下來買更好的牧草了，懂？」</span>
+                            </div>
+                        </div>
+                        <p class="mt-4 text-sm text-gray-400">（點評：這個回覆不僅承認了包裝沒變的事實，還順勢轉化為「把成本花在刀口上」的品質保證，同時維持了角色傲嬌的設定，讓圍觀者忍不住按讚支持。）</p>
                     </div>
-                    <p class="text-gray-400 text-sm line-through mb-2">原稿：義美鮮乳採用 100% 國家標準鮮乳，提供最純淨營養。</p>
-                    <p class="text-white text-sm">改寫：「除了鮮乳我真的什麼都沒有。這樣純情（？）的我，你還不帶回家嗎？」</p>
+                    <p>記住，在數位世界裡，防禦最好的方式就是幽默。當你能夠輕鬆面對自己的不完美時，酸民就找不到攻擊你的施力點了。</p>
                 </div>
-
-                <div class="space-y-3">
-                    <label class="block text-sm font-medium text-brand-neon">👉 將「你的品牌」的一句官方介紹或新聞稿，改寫成 Threads 風格：</label>
-                    <textarea id="ans3" rows="3" class="magnetic-input w-full rounded-xl p-4 resize-none" placeholder="原句：... 改寫後：..."></textarea>
+                
+                <div class="zuvio-box rounded-xl p-6 mt-8">
+                    <h3 class="text-white font-bold text-xl mb-2 flex items-center gap-2">
+                        <iconify-icon icon="solar:target-bold-duotone" class="text-brand-accent"></iconify-icon> 🎯 Zuvio 實作任務 06
+                    </h3>
+                    <p class="text-gray-300">請開啟 Zuvio，進入「實作任務 6：神回覆公關演練」。請想像有網友在你的貼文底下留下無腦酸言酸語（例如嫌棄產品太貴、功能太少）。請寫下該句負面留言，並撰寫一段符合你品牌調性的「高智商神回覆」。</p>
                 </div>
-            </div>
-
-            <div class="glass-panel rounded-3xl p-8 md:p-10 gs-reveal relative overflow-hidden group">
-                <div class="absolute top-0 left-0 w-1 h-full bg-white/20 group-hover:bg-brand-neon transition-colors"></div>
-                <div class="flex flex-col md:flex-row md:items-center gap-4 mb-8">
-                    <span class="font-outfit text-4xl md:text-5xl font-black text-white/10">04</span>
-                    <div>
-                        <h2 class="text-2xl font-bold tracking-wide">高互動投票設計 <span class="text-gray-500 text-sm font-normal ml-2">Engagement</span></h2>
-                        <p class="text-gray-400 mt-1 text-sm">示弱與二選一，是最高級的勾引。設定一個讓讀者「非選不可」的情境。</p>
-                    </div>
-                </div>
-
-                <div class="bg-black/40 rounded-2xl p-6 mb-8 border border-white/5">
-                    <div class="flex items-center gap-3 mb-3 text-brand-neon">
-                        <iconify-icon icon="solar:users-group-two-rounded-bold-duotone" class="text-2xl"></iconify-icon>
-                        <span class="font-bold tracking-wide">Niuniu 互動範例</span>
-                    </div>
-                    <p class="text-gray-300 text-sm">
-                        「這問題困擾 Niuniu 很久了，攸關鮮乳界的尊嚴，請大家投票：」<br>
-                        <span class="text-white mt-2 inline-block">A. 鮮乳派（單喝最香） / B. 拿鐵派（加咖啡才是王道）</span>
-                    </p>
-                </div>
-
-                <div class="space-y-3">
-                    <label class="block text-sm font-medium text-brand-neon">👉 針對「你的品牌」設計一個互動投票（含前言引導 + A/B 選項）：</label>
-                    <textarea id="ans4" rows="3" class="magnetic-input w-full rounded-xl p-4 resize-none" placeholder="前言：... | A 選項：... | B 選項：..."></textarea>
-                </div>
-            </div>
-
-            <div class="glass-panel rounded-3xl p-8 md:p-10 gs-reveal relative overflow-hidden group">
-                <div class="absolute top-0 left-0 w-1 h-full bg-white/20 group-hover:bg-brand-neon transition-colors"></div>
-                <div class="flex flex-col md:flex-row md:items-center gap-4 mb-8">
-                    <span class="font-outfit text-4xl md:text-5xl font-black text-white/10">05</span>
-                    <div>
-                        <h2 class="text-2xl font-bold tracking-wide">深度串連故事大綱 <span class="text-gray-500 text-sm font-normal ml-2">Long-form Thread</span></h2>
-                        <p class="text-gray-400 mt-1 text-sm">設計 3 則具備深度知識或強烈情感的長文串連（目標每則 500 字規模）。</p>
-                    </div>
-                </div>
-
-                <div class="bg-black/40 rounded-2xl p-6 mb-8 border border-white/5">
-                    <div class="flex items-center gap-3 mb-3 text-brand-neon">
-                        <iconify-icon icon="solar:layers-minimalistic-bold-duotone" class="text-2xl"></iconify-icon>
-                        <span class="font-bold tracking-wide">Niuniu 深度大綱範例</span>
-                    </div>
-                    <ul class="text-gray-300 text-sm space-y-3 list-decimal list-inside">
-                        <li><span class="text-white font-medium">凌晨四點的鮮度戰爭：</span>描述牧場冷空氣與擠乳器，探討為何堅持超低溫物流。這不只是賣奶，是與時間賽跑。</li>
-                        <li><span class="text-white font-medium">乳牛的職業尊嚴：</span>為什麼有些鮮乳放很久？因為 Niuniu 選擇短命而真實。我們不完美，但從不說謊。</li>
-                        <li><span class="text-white font-medium">完美拿鐵的科學：</span>乳脂肪在 60 度與 70 度的不同甜感。最後呼籲讀者去冰箱倒一杯試試。</li>
-                    </ul>
-                </div>
-
-                <div class="space-y-3">
-                    <label class="block text-sm font-medium text-brand-neon">👉 為你的品牌設計 3 則深度內容的大綱（請詳細描述你要講的故事或乾貨）：</label>
-                    <textarea id="ans5" rows="6" class="magnetic-input w-full rounded-xl p-4 resize-none" placeholder="1. 第一則大綱（誘餌/痛點）：...&#10;2. 第二則大綱（故事轉折/專業知識）：...&#10;3. 第三則大綱（結尾昇華/行動呼籲）：..."></textarea>
-                </div>
-            </div>
-
-            <div class="glass-panel rounded-3xl p-8 md:p-10 gs-reveal relative overflow-hidden group">
-                <div class="absolute top-0 left-0 w-1 h-full bg-white/20 group-hover:bg-brand-neon transition-colors"></div>
-                <div class="flex flex-col md:flex-row md:items-center gap-4 mb-8">
-                    <span class="font-outfit text-4xl md:text-5xl font-black text-white/10">06</span>
-                    <div>
-                        <h2 class="text-2xl font-bold tracking-wide">神回覆挑戰 <span class="text-gray-500 text-sm font-normal ml-2">Community Management</span></h2>
-                        <p class="text-gray-400 mt-1 text-sm">回覆不是結案，是公關秀。幽默感與不卑不亢是最好的盾牌。</p>
-                    </div>
-                </div>
-
-                <div class="bg-black/40 rounded-2xl p-6 mb-8 border border-white/5">
-                    <div class="flex items-center gap-3 mb-3 text-brand-neon">
-                        <iconify-icon icon="solar:chat-round-like-bold-duotone" class="text-2xl"></iconify-icon>
-                        <span class="font-bold tracking-wide">Niuniu 迎擊酸民</span>
-                    </div>
-                    <p class="text-gray-400 text-sm mb-2">酸民：「義美這包裝幾十年都沒變，醜爆了。」</p>
-                    <p class="text-white text-sm">神回覆：「Niuniu 這是經典美學，你懂什麼（傲嬌）。重點是內在，內在好嗎！包裝美了，難道奶會變甜嗎？」</p>
-                </div>
-
-                <div class="space-y-3">
-                    <label class="block text-sm font-medium text-brand-neon">👉 想像有人嫌「你的品牌」太貴或沒特色，你會怎麼展現「脆味」神回覆？</label>
-                    <textarea id="ans6" rows="2" class="magnetic-input w-full rounded-xl p-4 resize-none" placeholder="情境：... | 你的神回覆：..."></textarea>
-                </div>
-            </div>
-
-            <div class="pt-8 text-center gs-reveal">
-                <button type="button" onclick="copyAllAnswers()" id="copyBtn" class="magnetic-btn relative inline-flex items-center justify-center w-full md:w-auto px-12 py-5 bg-white text-black rounded-full text-lg font-black tracking-widest overflow-hidden transition-transform hover:scale-[1.02] shadow-[0_0_40px_rgba(255,255,255,0.2)]">
-                    <span class="relative z-10 flex items-center gap-3">
-                        <span id="btnText">複製所有練習草稿 (COPY ALL)</span>
-                        <iconify-icon icon="solar:copy-bold-duotone" class="text-2xl"></iconify-icon>
-                    </span>
-                    <div class="absolute inset-0 bg-brand-accent transform scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500 ease-out z-0"></div>
-                </button>
-                <p class="mt-4 text-xs text-gray-600 font-outfit uppercase tracking-widest">點擊按鈕將內容複製到剪貼簿，即可貼上至作業繳交區</p>
             </div>
 
         </div>
@@ -341,23 +347,24 @@
     <footer class="relative z-10 border-t border-white/10 py-12 mt-20 backdrop-blur-md bg-black/50">
         <div class="max-w-4xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
             <div class="flex flex-col items-center md:items-start gap-2">
-                <div class="flex items-center gap-4 text-gray-500 text-2xl">
+                <div class="flex items-center gap-4 text-brand-neon text-3xl">
                     <iconify-icon icon="simple-icons:threads" class="hover:text-white transition-colors"></iconify-icon>
-                    <iconify-icon icon="simple-icons:meta" class="hover:text-white transition-colors"></iconify-icon>
+                    <iconify-icon icon="simple-icons:googleads" class="hover:text-white transition-colors"></iconify-icon>
                     <iconify-icon icon="simple-icons:openai" class="hover:text-white transition-colors"></iconify-icon>
                 </div>
-                <p class="text-sm text-gray-600">National Taiwan University of Sport | Leisure Industry Management</p>
+                <p class="text-sm text-gray-500 font-outfit tracking-wider">National Taiwan University of Sport</p>
             </div>
             <div class="text-center md:text-right">
-                <p class="text-sm text-gray-400 font-medium">© 2026 Yalan Chang. All rights reserved.</p>
-                <p class="text-xs text-gray-600 mt-1 uppercase tracking-widest font-outfit">S21Going Digital Co. Innovation Lab</p>
+                <p class="text-sm text-gray-400 font-medium tracking-wide">© 2026 Yalan Chang. All rights reserved.</p>
+                <p class="text-xs text-brand-accent mt-1 uppercase tracking-widest font-outfit font-bold">Leisure Industry Management & Innovation Lab</p>
             </div>
         </div>
     </footer>
 
     <script>
+        // Custom Cursor Interaction
         const cursor = document.getElementById('cursor');
-        const magneticElements = document.querySelectorAll('.magnetic-btn, .magnetic-input, a, button');
+        const magneticElements = document.querySelectorAll('.magnetic-element, a, button');
 
         document.addEventListener('mousemove', (e) => {
             cursor.style.left = e.clientX + 'px';
@@ -369,18 +376,7 @@
             el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
         });
 
-        document.querySelectorAll('.magnetic-btn').forEach(btn => {
-            btn.addEventListener('mousemove', (e) => {
-                const rect = btn.getBoundingClientRect();
-                const x = e.clientX - rect.left - rect.width / 2;
-                const y = e.clientY - rect.top - rect.height / 2;
-                gsap.to(btn, { x: x * 0.2, y: y * 0.2, duration: 0.3, ease: 'power2.out' });
-            });
-            btn.addEventListener('mouseleave', () => {
-                gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.3)' });
-            });
-        });
-
+        // GSAP Scroll Animations
         gsap.registerPlugin(ScrollTrigger);
         
         gsap.to('.hero-content', {
@@ -413,42 +409,6 @@
             e.preventDefault();
             document.getElementById('formSection').scrollIntoView({ behavior: 'smooth' });
         });
-
-        window.onbeforeunload = function() {
-            let hasText = false;
-            for(let i=1; i<=6; i++) {
-                if(document.getElementById('ans'+i).value.trim() !== '') hasText = true;
-            }
-            if(hasText) return "您的草稿尚未複製或儲存，確定要離開嗎？";
-        };
-
-        // Copy Function
-        function copyAllAnswers() {
-            let fullText = "【Threads 品牌發文實戰練習草稿】\n\n";
-            fullText += "01. 品牌靈魂素描：\n" + (document.getElementById('ans1').value || "未填寫") + "\n\n";
-            fullText += "02. 主題靈感九宮格：\n" + (document.getElementById('ans2').value || "未填寫") + "\n\n";
-            fullText += "03. 廢文變金文：\n" + (document.getElementById('ans3').value || "未填寫") + "\n\n";
-            fullText += "04. 高互動投票設計：\n" + (document.getElementById('ans4').value || "未填寫") + "\n\n";
-            fullText += "05. 深度串連故事大綱：\n" + (document.getElementById('ans5').value || "未填寫") + "\n\n";
-            fullText += "06. 神回覆挑戰：\n" + (document.getElementById('ans6').value || "未填寫") + "\n";
-
-            navigator.clipboard.writeText(fullText).then(() => {
-                const btnText = document.getElementById('btnText');
-                const originalText = btnText.innerText;
-                btnText.innerText = "複製成功！請前往作業區貼上";
-                document.getElementById('copyBtn').classList.add('bg-brand-accent');
-                
-                // 複製後解除防呆，讓學生可以安心關閉網頁
-                window.onbeforeunload = null;
-
-                setTimeout(() => {
-                    btnText.innerText = originalText;
-                    document.getElementById('copyBtn').classList.remove('bg-brand-accent');
-                }, 3000);
-            }).catch(err => {
-                alert("複製失敗，請手動選取複製！");
-            });
-        }
     </script>
 </body>
 </html>
