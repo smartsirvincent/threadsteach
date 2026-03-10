@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threads 品牌發文實戰 | AI 應用與 Vibe Coding 專屬教材</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Outfit:wght@300;500;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                        outfit: ['"Outfit"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            dark: '#0a0a0a',
+                            light: '#f4f4f5',
+                            accent: '#10b981', // Niuniu Green
+                            neon: '#34d399'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #f4f4f5;
+            overflow-x: hidden;
+            cursor: none; 
+        }
+
+        /* Global Noise Texture */
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Custom Cursor */
+        .custom-cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            background-color: #f4f4f5;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 100;
+            mix-blend-mode: difference;
+            transition: width 0.3s ease, height 0.3s ease, background-color 0.3s ease;
+        }
+        .custom-cursor.hovered {
+            width: 60px;
+            height: 60px;
+            background-color: #34d399;
+        }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Input Styling */
+        .magnetic-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .magnetic-input:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #10b981;
+            outline: none;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #10b981; }
+
+        .v-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.05), transparent);
+            z-index: -1;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-accent selection:text-white">
+
+    <div class="noise-overlay"></div>
+    <div class="custom-cursor" id="cursor"></div>
+
+    <div class="fixed inset-0 pointer-events-none flex justify-between px-10 md:px-20 z-[-1]">
+        <div class="v-line left-[20%]"></div>
+        <div class="v-line left-[50%]"></div>
+        <div class="v-line left-[80%]"></div>
+    </div>
+
+    <header class="relative min-h-screen flex flex-col justify-center items-center px-4 overflow-hidden">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-accent/20 rounded-full blur-[120px] pointer-events-none"></div>
+        
+        <div class="z-10 text-center max-w-4xl mx-auto hero-content">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel mb-8 text-sm font-outfit tracking-widest uppercase text-brand-neon">
+                <iconify-icon icon="solar:clapperboard-play-bold-duotone"></iconify-icon>
+                AI 應用與 Vibe Coding 實戰專案
+            </div>
+            
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-tight tracking-tight">
+                THREADS <br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-300 to-gray-500">DIGITAL PERSONA</span>
+            </h1>
+            
+            <p class="text-lg md:text-xl text-gray-400 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
+                這是一場數位人格的淬鍊。跟著 <span class="text-white font-medium">義美鮮乳 Niuniu</span> 的腳步，解構品牌調性，鍛造出具備極致傳播力的 Threads 爆文邏輯。（本頁面為數位練習草稿紙，請於完成後點擊最下方按鈕複製內容）
+            </p>
+
+            <button id="scrollBtn" class="magnetic-btn group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-black rounded-full font-bold overflow-hidden transition-transform hover:scale-105">
+                <span class="relative z-10 flex items-center gap-2">
+                    開始實作 
+                    <iconify-icon icon="solar:arrow-down-linear" class="text-xl group-hover:translate-y-1 transition-transform"></iconify-icon>
+                </span>
+                <div class="absolute inset-0 bg-brand-accent transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out z-0"></div>
+            </button>
+        </div>
+
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50 scroll-indicator">
+            <span class="text-xs font-outfit tracking-widest uppercase">Scroll to explore</span>
+            <div class="w-[1px] h-12 bg-gradient-to-b from-white to-transparent"></div>
+        </div>
+    </header>
+
+    <main class="relative z-10 pb-32 px-4" id="formSection">
+        <div class="max-w-4xl mx-auto space-y-12">
+            
+            <div class="glass-panel rounded-3xl p-8 md:p-10 gs-reveal relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-1 h-full bg-white/20 group-hover:bg-brand-neon transition-colors"></div>
+                <div class="flex flex-col md:flex-row md:items-center gap-4 mb-8">
+                    <span class="font-outfit text-4xl md:text-5xl font-black text-white/10">01</span>
+                    <div>
+                        <h2 class="text-2xl font-bold tracking-wide">品牌靈魂素描 <span class="text-gray-500 text-sm font-normal ml-2">Persona</span></h2>
+                        <p class="text-gray-400 mt-1 text-sm">Threads 追蹤的是「人」。請避開官腔，設定一個有喜好、有缺點的「人設」。</p>
+                    </div>
+                </div>
+
+                <div class="bg-black/40 rounded-2xl p-6 mb-8 border border-white/5">
+                    <div class="flex items-center gap-3 mb-3 text-brand-neon">
+                        <iconify-icon icon="solar:lightbulb-bolt-bold-duotone" class="text-2xl"></iconify-icon>
+                        <span class="font-bold tracking-wide">Niuniu 創意解析</span>
+                    </div>
+                    <p class="text-gray-300 leading-relaxed text-sm">
+                        一個對「鮮度」有強迫症、愛碎碎念的牧場乳牛。<br>
+                        <span class="text-white font-medium">弱點：</span>看到有人把鮮乳拿去微波太久會生氣。<br>
+                        <span class="text-white font-medium">口頭禪：</span>「鮮度是我的底線，好喝是你的福氣。」
+                    </p>
+                </div>
+
+                <div class="space-y-3">
+                    <label class="block text-sm font-medium text-brand-neon">👉 請設定「你的品牌」角色暱稱、可愛的弱點與口頭禪：</label>
+                    <textarea id="ans1" rows="3" class="magnetic-input w-full rounded-xl p-4 resize-none" placeholder="例如：一位每天被數據追殺的運動行銷員，口頭禪是..."></textarea>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-3xl p-8 md:p-10 gs-reveal relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-1 h-full bg-white/20 group-hover:bg-brand-neon transition-colors"></div>
+                <div class="flex flex-col md:flex-row md:items-center gap-4 mb-8">
+                    <span class="font-outfit text-4xl md:text-5xl font-black text-white/10">02</span>
+                    <div>
+                        <h2 class="text-2xl font-bold tracking-wide">主題靈感九宮格 <span class="text-gray-500 text-sm font-normal ml-2">Ideation Matrix</span></h2>
+                        <p class="text-gray-400 mt-1 text-sm">運用「品牌調性」與「受眾群體」兩個維度，交叉產出內容靈感。</p>
+                    </div>
+                </div>
+
+                <div class="bg-black/40 rounded-2xl p-6 mb-8 border border-white/5">
+                    <div class="flex items-center gap-3 mb-3 text-brand-neon">
+                        <iconify-icon icon="solar:map-arrow-square-bold-duotone" class="text-2xl"></iconify-icon>
+                        <span class="font-bold tracking-wide">Niuniu 維度拆解</span>
+                    </div>
+                    <ul class="text-gray-300 text-sm space-y-2">
+                        <li><span class="text-white">受眾設定：</span>忙碌家長 / 健身族 / 厭世上班族</li>
+                        <li><span class="text-white">調性設定：</span>幽默 / 專業 / 感性</li>
+                        <li><span class="text-white">靈感產出：</span>(對厭世上班族+幽默) 咖啡加奶，是續命水而非拿鐵。</li>
+                    </ul>
+                </div>
+
+                <div class="space-y-3">
+                    <label class="block text-sm font-medium text-brand-neon">👉 設定你的兩個維度（調性與受眾），並寫出至少 3 個交叉主題：</label>
+                    <textarea id="ans2" rows="4" class="magnetic-input w-full rounded-xl p-4 resize-none" placeholder="受眾維度：... | 調性維度：... | 主題 1：... | 主題 2：..."></textarea>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-3xl p-8 md:p-10 gs-reveal relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-1 h-full bg-white/20 group-hover:bg-brand-neon transition-colors"></div>
+                <div class="flex flex-col md:flex-row md:items-center gap-4 mb-8">
+                    <span class="font-outfit text-4xl md:text-5xl font-black text-white/10">03</span>
+                    <div>
+                        <h2 class="text-2xl font-bold tracking-wide">廢文變金文 <span class="text-gray-500 text-sm font-normal ml-2">Copywriting</span></h2>
+                        <p class="text-gray-400 mt-1 text-sm">刪掉形容詞，加入「體感」與「情緒」，掌握黃金三秒。</p>
+                    </div>
+                </div>
+
+                <div class="bg-black/40 rounded-2xl p-6 mb-8 border border-white/5">
+                    <div class="flex items-center gap-3 mb-3 text-brand-neon">
+                        <iconify-icon icon="solar:pen-new-square-bold-duotone" class="text-2xl"></iconify-icon>
+                        <span class="font-bold tracking-wide">Niuniu 改寫示範</span>
+                    </div>
+                    <p class="text-gray-400 text-sm line-through mb-2">原稿：義美鮮乳採用 100% 國家標準鮮乳，提供最純淨營養。</p>
+                    <p class="text-white text-sm">改寫：「除了鮮乳我真的什麼都沒有。這樣純情（？）的我，你還不帶回家嗎？」</p>
+                </div>
+
+                <div class="space-y-3">
+                    <label class="block text-sm font-medium text-brand-neon">👉 將「你的品牌」的一句官方介紹或新聞稿，改寫成 Threads 風格：</label>
+                    <textarea id="ans3" rows="3" class="magnetic-input w-full rounded-xl p-4 resize-none" placeholder="原句：... 改寫後：..."></textarea>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-3xl p-8 md:p-10 gs-reveal relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-1 h-full bg-white/20 group-hover:bg-brand-neon transition-colors"></div>
+                <div class="flex flex-col md:flex-row md:items-center gap-4 mb-8">
+                    <span class="font-outfit text-4xl md:text-5xl font-black text-white/10">04</span>
+                    <div>
+                        <h2 class="text-2xl font-bold tracking-wide">高互動投票設計 <span class="text-gray-500 text-sm font-normal ml-2">Engagement</span></h2>
+                        <p class="text-gray-400 mt-1 text-sm">示弱與二選一，是最高級的勾引。設定一個讓讀者「非選不可」的情境。</p>
+                    </div>
+                </div>
+
+                <div class="bg-black/40 rounded-2xl p-6 mb-8 border border-white/5">
+                    <div class="flex items-center gap-3 mb-3 text-brand-neon">
+                        <iconify-icon icon="solar:users-group-two-rounded-bold-duotone" class="text-2xl"></iconify-icon>
+                        <span class="font-bold tracking-wide">Niuniu 互動範例</span>
+                    </div>
+                    <p class="text-gray-300 text-sm">
+                        「這問題困擾 Niuniu 很久了，攸關鮮乳界的尊嚴，請大家投票：」<br>
+                        <span class="text-white mt-2 inline-block">A. 鮮乳派（單喝最香） / B. 拿鐵派（加咖啡才是王道）</span>
+                    </p>
+                </div>
+
+                <div class="space-y-3">
+                    <label class="block text-sm font-medium text-brand-neon">👉 針對「你的品牌」設計一個互動投票（含前言引導 + A/B 選項）：</label>
+                    <textarea id="ans4" rows="3" class="magnetic-input w-full rounded-xl p-4 resize-none" placeholder="前言：... | A 選項：... | B 選項：..."></textarea>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-3xl p-8 md:p-10 gs-reveal relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-1 h-full bg-white/20 group-hover:bg-brand-neon transition-colors"></div>
+                <div class="flex flex-col md:flex-row md:items-center gap-4 mb-8">
+                    <span class="font-outfit text-4xl md:text-5xl font-black text-white/10">05</span>
+                    <div>
+                        <h2 class="text-2xl font-bold tracking-wide">深度串連故事大綱 <span class="text-gray-500 text-sm font-normal ml-2">Long-form Thread</span></h2>
+                        <p class="text-gray-400 mt-1 text-sm">設計 3 則具備深度知識或強烈情感的長文串連（目標每則 500 字規模）。</p>
+                    </div>
+                </div>
+
+                <div class="bg-black/40 rounded-2xl p-6 mb-8 border border-white/5">
+                    <div class="flex items-center gap-3 mb-3 text-brand-neon">
+                        <iconify-icon icon="solar:layers-minimalistic-bold-duotone" class="text-2xl"></iconify-icon>
+                        <span class="font-bold tracking-wide">Niuniu 深度大綱範例</span>
+                    </div>
+                    <ul class="text-gray-300 text-sm space-y-3 list-decimal list-inside">
+                        <li><span class="text-white font-medium">凌晨四點的鮮度戰爭：</span>描述牧場冷空氣與擠乳器，探討為何堅持超低溫物流。這不只是賣奶，是與時間賽跑。</li>
+                        <li><span class="text-white font-medium">乳牛的職業尊嚴：</span>為什麼有些鮮乳放很久？因為 Niuniu 選擇短命而真實。我們不完美，但從不說謊。</li>
+                        <li><span class="text-white font-medium">完美拿鐵的科學：</span>乳脂肪在 60 度與 70 度的不同甜感。最後呼籲讀者去冰箱倒一杯試試。</li>
+                    </ul>
+                </div>
+
+                <div class="space-y-3">
+                    <label class="block text-sm font-medium text-brand-neon">👉 為你的品牌設計 3 則深度內容的大綱（請詳細描述你要講的故事或乾貨）：</label>
+                    <textarea id="ans5" rows="6" class="magnetic-input w-full rounded-xl p-4 resize-none" placeholder="1. 第一則大綱（誘餌/痛點）：...&#10;2. 第二則大綱（故事轉折/專業知識）：...&#10;3. 第三則大綱（結尾昇華/行動呼籲）：..."></textarea>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-3xl p-8 md:p-10 gs-reveal relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-1 h-full bg-white/20 group-hover:bg-brand-neon transition-colors"></div>
+                <div class="flex flex-col md:flex-row md:items-center gap-4 mb-8">
+                    <span class="font-outfit text-4xl md:text-5xl font-black text-white/10">06</span>
+                    <div>
+                        <h2 class="text-2xl font-bold tracking-wide">神回覆挑戰 <span class="text-gray-500 text-sm font-normal ml-2">Community Management</span></h2>
+                        <p class="text-gray-400 mt-1 text-sm">回覆不是結案，是公關秀。幽默感與不卑不亢是最好的盾牌。</p>
+                    </div>
+                </div>
+
+                <div class="bg-black/40 rounded-2xl p-6 mb-8 border border-white/5">
+                    <div class="flex items-center gap-3 mb-3 text-brand-neon">
+                        <iconify-icon icon="solar:chat-round-like-bold-duotone" class="text-2xl"></iconify-icon>
+                        <span class="font-bold tracking-wide">Niuniu 迎擊酸民</span>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-2">酸民：「義美這包裝幾十年都沒變，醜爆了。」</p>
+                    <p class="text-white text-sm">神回覆：「Niuniu 這是經典美學，你懂什麼（傲嬌）。重點是內在，內在好嗎！包裝美了，難道奶會變甜嗎？」</p>
+                </div>
+
+                <div class="space-y-3">
+                    <label class="block text-sm font-medium text-brand-neon">👉 想像有人嫌「你的品牌」太貴或沒特色，你會怎麼展現「脆味」神回覆？</label>
+                    <textarea id="ans6" rows="2" class="magnetic-input w-full rounded-xl p-4 resize-none" placeholder="情境：... | 你的神回覆：..."></textarea>
+                </div>
+            </div>
+
+            <div class="pt-8 text-center gs-reveal">
+                <button type="button" onclick="copyAllAnswers()" id="copyBtn" class="magnetic-btn relative inline-flex items-center justify-center w-full md:w-auto px-12 py-5 bg-white text-black rounded-full text-lg font-black tracking-widest overflow-hidden transition-transform hover:scale-[1.02] shadow-[0_0_40px_rgba(255,255,255,0.2)]">
+                    <span class="relative z-10 flex items-center gap-3">
+                        <span id="btnText">複製所有練習草稿 (COPY ALL)</span>
+                        <iconify-icon icon="solar:copy-bold-duotone" class="text-2xl"></iconify-icon>
+                    </span>
+                    <div class="absolute inset-0 bg-brand-accent transform scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-500 ease-out z-0"></div>
+                </button>
+                <p class="mt-4 text-xs text-gray-600 font-outfit uppercase tracking-widest">點擊按鈕將內容複製到剪貼簿，即可貼上至作業繳交區</p>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="relative z-10 border-t border-white/10 py-12 mt-20 backdrop-blur-md bg-black/50">
+        <div class="max-w-4xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex flex-col items-center md:items-start gap-2">
+                <div class="flex items-center gap-4 text-gray-500 text-2xl">
+                    <iconify-icon icon="simple-icons:threads" class="hover:text-white transition-colors"></iconify-icon>
+                    <iconify-icon icon="simple-icons:meta" class="hover:text-white transition-colors"></iconify-icon>
+                    <iconify-icon icon="simple-icons:openai" class="hover:text-white transition-colors"></iconify-icon>
+                </div>
+                <p class="text-sm text-gray-600">National Taiwan University of Sport | Leisure Industry Management</p>
+            </div>
+            <div class="text-center md:text-right">
+                <p class="text-sm text-gray-400 font-medium">© 2026 Yalan Chang. All rights reserved.</p>
+                <p class="text-xs text-gray-600 mt-1 uppercase tracking-widest font-outfit">S21Going Digital Co. Innovation Lab</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const cursor = document.getElementById('cursor');
+        const magneticElements = document.querySelectorAll('.magnetic-btn, .magnetic-input, a, button');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        magneticElements.forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+        });
+
+        document.querySelectorAll('.magnetic-btn').forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                gsap.to(btn, { x: x * 0.2, y: y * 0.2, duration: 0.3, ease: 'power2.out' });
+            });
+            btn.addEventListener('mouseleave', () => {
+                gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.3)' });
+            });
+        });
+
+        gsap.registerPlugin(ScrollTrigger);
+        
+        gsap.to('.hero-content', {
+            yPercent: 50,
+            opacity: 0,
+            scrollTrigger: {
+                trigger: 'header',
+                start: 'top top',
+                end: 'bottom top',
+                scrub: true
+            }
+        });
+
+        const reveals = gsap.utils.toArray('.gs-reveal');
+        reveals.forEach((element) => {
+            gsap.from(element, {
+                y: 80,
+                opacity: 0,
+                duration: 1.2,
+                ease: "expo.out",
+                scrollTrigger: {
+                    trigger: element,
+                    start: "top 85%",
+                    toggleActions: "play none none reverse"
+                }
+            });
+        });
+
+        document.getElementById('scrollBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('formSection').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        window.onbeforeunload = function() {
+            let hasText = false;
+            for(let i=1; i<=6; i++) {
+                if(document.getElementById('ans'+i).value.trim() !== '') hasText = true;
+            }
+            if(hasText) return "您的草稿尚未複製或儲存，確定要離開嗎？";
+        };
+
+        // Copy Function
+        function copyAllAnswers() {
+            let fullText = "【Threads 品牌發文實戰練習草稿】\n\n";
+            fullText += "01. 品牌靈魂素描：\n" + (document.getElementById('ans1').value || "未填寫") + "\n\n";
+            fullText += "02. 主題靈感九宮格：\n" + (document.getElementById('ans2').value || "未填寫") + "\n\n";
+            fullText += "03. 廢文變金文：\n" + (document.getElementById('ans3').value || "未填寫") + "\n\n";
+            fullText += "04. 高互動投票設計：\n" + (document.getElementById('ans4').value || "未填寫") + "\n\n";
+            fullText += "05. 深度串連故事大綱：\n" + (document.getElementById('ans5').value || "未填寫") + "\n\n";
+            fullText += "06. 神回覆挑戰：\n" + (document.getElementById('ans6').value || "未填寫") + "\n";
+
+            navigator.clipboard.writeText(fullText).then(() => {
+                const btnText = document.getElementById('btnText');
+                const originalText = btnText.innerText;
+                btnText.innerText = "複製成功！請前往作業區貼上";
+                document.getElementById('copyBtn').classList.add('bg-brand-accent');
+                
+                // 複製後解除防呆，讓學生可以安心關閉網頁
+                window.onbeforeunload = null;
+
+                setTimeout(() => {
+                    btnText.innerText = originalText;
+                    document.getElementById('copyBtn').classList.remove('bg-brand-accent');
+                }, 3000);
+            }).catch(err => {
+                alert("複製失敗，請手動選取複製！");
+            });
+        }
+    </script>
+</body>
+</html>
